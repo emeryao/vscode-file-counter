@@ -2,6 +2,9 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+const builtinFileTypes: Array<[string, string | vscode.FileType]> = Object.entries(vscode.FileType)
+    .filter(i => !Number.isNaN(Number.parseInt(i[0]))).sort((x, y) => Number.parseInt(y[0]) - Number.parseInt(x[0]));
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
@@ -24,8 +27,7 @@ export async function activate(context: vscode.ExtensionContext) {
 export function deactivate() { }
 
 function countFiles(list: Array<[string, vscode.FileType]>): string {
-    return Object.entries(vscode.FileType)
-        .filter(i => !Number.isNaN(Number.parseInt(i[0])))
+    return builtinFileTypes
         .map(i => ({ type: i[1], count: list.filter(r => r[1].toString() === i[0]).length }))
         .filter(i => i.count > 0)
         .map(i => `${getFileTypeIcon(i.type as string)} ${i.count}`)
@@ -33,9 +35,7 @@ function countFiles(list: Array<[string, vscode.FileType]>): string {
 }
 
 function getFileTypeIcon(fileType: string): string {
-    const fileTypes: Array<string> = Object.entries(vscode.FileType)
-        .filter(i => !Number.isNaN(Number.parseInt(i[0])))
-        .map(i => i[1] as string);
+    const fileTypes: Array<string> = builtinFileTypes.map(i => i[1] as string);
 
     if (!fileTypes.includes(fileType)) {
         return '$(question)';
